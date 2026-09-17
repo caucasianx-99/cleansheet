@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>CleanSheet — CSV Data Cleaner</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header class="app-header">
+        <div class="brand">
+            <h1>CleanSheet</h1>
+            <p>Clean, inspect and export CSV data directly in your browser.</p>
+        </div>
+    </header>
+
+    <main class="container">
+
+        <!-- Upload Section -->
+        <section class="panel">
+            <div class="section-heading">
+                <h2>Import Dataset</h2>
+                <p>Upload a CSV file to inspect and clean your data.</p>
+            </div>
+
+            <div id="dropZone" class="drop-zone">
+
+                <div class="drop-icon">📄</div>
+
+                <h3>Drop your CSV file here</h3>
+
+                <p>or</p>
+
+                <label for="fileInput" class="primary-button">
+                    Choose File
+                </label>
+
+                <input
+                    type="file"
+                    id="fileInput"
+                    accept=".csv,text/csv"
+                    hidden
+                >
+
+                <p class="file-hint">
+                    CSV files only
+                </p>
+
+            </div>
+
+            <div id="fileInfo" class="file-info hidden">
+                <span>Loaded file:</span>
+                <strong id="fileName">None</strong>
+            </div>
+        </section>
+
+
+        <!-- Dataset Summary -->
+        <section id="summarySection" class="panel hidden">
+
+            <div class="section-heading">
+                <h2>Dataset Summary</h2>
+                <p>Quick overview of the imported data.</p>
+            </div>
+
+            <div class="stats-grid">
+
+                <div class="stat-card">
+                    <span class="stat-label">Rows</span>
+                    <strong id="rowCount">0</strong>
+                </div>
+
+                <div class="stat-card">
+                    <span class="stat-label">Columns</span>
+                    <strong id="columnCount">0</strong>
+                </div>
+
+                <div class="stat-card">
+                    <span class="stat-label">Duplicates</span>
+                    <strong id="duplicateCount">0</strong>
+                </div>
+
+                <div class="stat-card">
+                    <span class="stat-label">Missing Values</span>
+                    <strong id="missingCount">0</strong>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- Cleaning Controls -->
+        <section id="cleaningSection" class="panel hidden">
+
+            <div class="section-heading">
+                <h2>Data Cleaning</h2>
+                <p>Apply common cleanup operations to your dataset.</p>
+            </div>
+
+            <div class="action-grid">
+
+    <button id="removeDuplicatesBtn" class="action-button">
+        Remove Duplicates
+    </button>
+
+    <button id="removeBlankRowsBtn" class="action-button">
+        Remove Blank Rows
+    </button>
+
+    <button id="trimSpacesBtn" class="action-button">
+        Trim Extra Spaces
+    </button>
+
+    <button id="resetDataBtn" class="secondary-button">
+        Reset Dataset
+    </button>
+
+</div>
+
+<div class="missing-tools">
+
+    <select id="missingColumnSelect">
+        <option value="">Select column</option>
+    </select>
+
+    <input
+        type="text"
+        id="missingValueInput"
+        placeholder="Replacement value"
+    >
+
+    <button id="fillMissingBtn" class="action-button">
+        Fill Missing Values
+    </button>
+
+    <button id="removeMissingRowsBtn" class="secondary-button">
+        Remove Rows With Missing Values
+    </button>
+
+</div>
+
+<div id="statusMessage" class="status-message"></div>
+
+            <div id="statusMessage" class="status-message"></div>
+
+        </section>
+
+<!-- Column Statistics -->
+<section id="statisticsSection" class="panel hidden">
+
+    <div class="section-heading">
+        <h2>Column Statistics</h2>
+        <p>Select a column to inspect its data quality and basic statistics.</p>
+    </div>
+
+    <div class="statistics-toolbar">
+
+        <label for="columnSelect">
+            Column
+        </label>
+
+        <select id="columnSelect">
+            <option value="">
+                Select a column
+            </option>
+        </select>
+
+    </div>
+
+    <div id="columnStats" class="stats-grid">
+
+        <div class="stat-card">
+            <span class="stat-label">Values</span>
+            <strong id="statValues">—</strong>
+        </div>
+
+        <div class="stat-card">
+            <span class="stat-label">Missing</span>
+            <strong id="statMissing">—</strong>
+        </div>
+
+        <div class="stat-card">
+            <span class="stat-label">Unique</span>
+            <strong id="statUnique">—</strong>
+        </div>
+
+        <div class="stat-card">
+            <span class="stat-label" id="statExtraLabel">Type</span>
+            <strong id="statExtra">—</strong>
+        </div>
+
+    </div>
+
+    <div id="numericStats" class="numeric-stats hidden">
+
+        <div class="stat-card">
+            <span class="stat-label">Minimum</span>
+            <strong id="statMin">—</strong>
+        </div>
+
+        <div class="stat-card">
+            <span class="stat-label">Maximum</span>
+            <strong id="statMax">—</strong>
+        </div>
+
+        <div class="stat-card">
+            <span class="stat-label">Average</span>
+            <strong id="statAverage">—</strong>
+        </div>
+
+        <div class="stat-card">
+            <span class="stat-label">Median</span>
+            <strong id="statMedian">—</strong>
+        </div>
+
+    </div>
+
+</section>
+
+        <!-- Data Preview -->
+        <section id="previewSection" class="panel hidden">
+
+            <div class="preview-header">
+
+    <div class="section-heading">
+        <h2>Data Preview</h2>
+        <p>Search, sort and inspect your dataset.</p>
+    </div>
+
+    <button id="downloadBtn" class="primary-button">
+        Download Cleaned CSV
+    </button>
+
+</div>
+
+<div class="table-tools">
+
+    <input
+        type="search"
+        id="searchInput"
+        placeholder="Search dataset..."
+        autocomplete="off"
+    >
+
+    <div class="pagination-controls">
+
+        <button id="previousPageBtn" class="secondary-button">
+            Previous
+        </button>
+
+        <span id="pageInfo">
+            Page 1 of 1
+        </span>
+
+        <button id="nextPageBtn" class="secondary-button">
+            Next
+        </button>
+
+    </div>
+
+</div>
+
+            <div class="table-wrapper">
+
+                <table id="dataTable">
+
+                    <thead id="tableHead"></thead>
+
+                    <tbody id="tableBody"></tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <footer>
+        <p>
+            CleanSheet — Independent portfolio project
+        </p>
+    </footer>
+
+
+    <script src="script.js"></script>
+
+</body>
+</html>
